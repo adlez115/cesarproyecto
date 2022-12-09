@@ -13,4 +13,5 @@ class Categories extends Model
         'name',
         'description'
     ];
+
 }

@@ -4,61 +4,74 @@ namespace App\Http\Controllers;
 
 use App\Models\Entries;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controller;
 
 class EntriesController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        //
+    public function obtenerAllEntries(){
+
+        //$usuarios = Users::with('citas')->get();
+        $entries = Entries::all();
+        return $entries;
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
+    public function crearEntries(Request $request){
+        $data = $this->validateRequestCrear($request);
+
+        $entries = Entries::create($data);
+            return response([
+                'message'=>'se creo con exito el Entry',
+                'id'=> $entries['id']
+            ], 201);
+        }
+
+    public function modificarEntries(Request $request, $id){
+        $entries = Entries::find($id);
+        if(!$entries){
+            return response([
+                'message'=>'Entry no encontrado'
+            ],404);
+        }
+
+        $data = $this->validateRequestModificar($request);
+
+        $entries->update($data);
+
+        return response([
+            'message'=>'Se modifico el entry'
+        ]);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Entries  $entries
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Entries $entries)
-    {
-        //
+    public function eliminarEntries($id){
+        $entries = Entries::find($id);
+        if(!$entries){
+            return response([
+                'message'=>'No encontrado'
+            ],404);
+        };
+
+        $entries->delete();
+
+        return response([
+            'message'=>'Entry Eliminado'
+        ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Entries  $entries
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, Entries $entries)
-    {
-        //
-    }
+    public function validateRequestCrear(Request $request){
+        return $request->validate([
+            'title' => 'required|string',
+            'content' => 'required|string',
+            'status' => 'required|string',
+            'image' => 'required|string'
+        ]);
+        }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Entries  $entries
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Entries $entries)
-    {
-        //
-    }
+    public function validateRequestModificar(Request $request){
+        return $request->validate([
+            'title' => 'required|string',
+            'content' => 'required|string',
+            'status' => 'required|string',
+            'image' => 'required|string'
+        ]);
+        }
 }

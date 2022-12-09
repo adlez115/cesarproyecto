@@ -4,61 +4,69 @@ namespace App\Http\Controllers;
 
 use App\Models\Categories;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controller;
 
 class CategoriesController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        //
+    public function obtenerAllCategories(){
+        //$usuarios = Users::with('citas')->get();
+        $categories = Categories::all();
+        return $categories;
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
+    public function crearCategories(Request $request){
+        $data = $this->validateRequestCrear($request);
+
+        $categories = Categories::create($data);
+            return response([
+                'message'=>'se creo con exito la Category',
+                'id'=> $categories['id']
+            ], 201);
+        }
+
+    public function modificarCategories(Request $request, $id){
+        $categories = Categories::find($id);
+        if(!$categories){
+            return response([
+                'message'=>'Category no encontrado'
+            ],404);
+        }
+
+        $data = $this->validateRequestModificar($request);
+
+        $categories->update($data);
+
+        return response([
+            'message'=>'Se modifico la Category'
+        ]);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Categories  $categories
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Categories $categories)
-    {
-        //
+    public function eliminar($id){
+        $categories = Categories::find($id);
+        if(!$categories){
+            return response([
+                'message'=>'No encontrado'
+            ],404);
+        };
+
+        $categories->delete();
+
+        return response([
+            'message'=>'Category Eliminada'
+        ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Categories  $categories
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, Categories $categories)
-    {
-        //
-    }
+    public function validateRequestCrear(Request $request){
+        return $request->validate([
+            'name' => 'required|string',
+            'description' => 'required|string'
+        ]);
+        }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Categories  $categories
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Categories $categories)
-    {
-        //
-    }
+    public function validateRequestModificar(Request $request){
+        return $request->validate([
+            'name' => 'required|string',
+            'description' => 'required|string'
+        ]);
+        }
 }
